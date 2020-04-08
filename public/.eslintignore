@@ -1,0 +1,7 @@
+**/* .js
+
+# Valid
+\mestoserver\public.js
+
+# Invalid
+\root\src\*.js

@@ -10,15 +10,17 @@ const getUsersMiddleware = (req, res, next) => {
     if (err) {
       res.status(400).send({ message: 'Ошибка чтения файла' });
       return next(true);
-    }
-    try {
-      const users = JSON.parse(data);
-      req.users = users;
-      next();
-    // eslint-disable-next-line no-shadow
-    } catch (err) {
-      res.status(400).send({ message: 'Ошибка в файле' });
-      return next(true);
+      // eslint-disable-next-line no-else-return
+    } else {
+      try {
+        const users = JSON.parse(data);
+        req.users = users;
+        next();
+      // eslint-disable-next-line no-shadow
+      } catch (err) {
+        res.status(400).send({ message: 'Ошибка в файле' });
+        return next(true);
+      }
     }
   });
 };

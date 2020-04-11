@@ -8,15 +8,17 @@ const getCardsMiddleware = (req, res, next) => {
     if (err) {
       res.status(400).send({ message: 'Ошибка чтения файла' });
       return next(true);
-    }
-    try {
-      const cards = JSON.parse(data);
-      req.cards = cards;
-      next();
-    // eslint-disable-next-line no-shadow
-    } catch (err) {
-      res.status(400).send({ message: 'Ошибка в файле' });
-      return next(true);
+    // eslint-disable-next-line no-else-return
+    } else {
+      try {
+        const cards = JSON.parse(data);
+        req.cards = cards;
+        next();
+      // eslint-disable-next-line no-shadow
+      } catch (err) {
+        res.status(400).send({ message: 'Ошибка в файле' });
+        return next(true);
+      }
     }
   });
 };

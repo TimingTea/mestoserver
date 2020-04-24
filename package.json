@@ -5,13 +5,14 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "app.js",
+    "start": "node app.js",
     "dev": "nodemon app.js"
   },
   "author": "TimurB",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "mongoose": "^5.9.9"
   },
   "devDependencies": {
     "eslint": "^6.8.0",

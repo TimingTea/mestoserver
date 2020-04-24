@@ -2,5 +2,6 @@
 
 # Valid
 /public
+_id
 # Invalid
 \root\src\*.js

@@ -3,4 +3,3 @@
 # Valid
 /public
 # Invalid
-\root\src\*.js

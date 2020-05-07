@@ -1,10 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { errorPage } = require('./routes/errorPage');
+const { login, createUser } = require('./controllers/users');
+const { auth } = require('./middlewares/auth');
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -17,12 +20,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(bodyParser.json());
-app.use((req, res, next) => {
-  req.user = {
-    _id: '5ea1a032fcd8c63074f145c0',
-  };
-  next();
-});
+
+app.use(helmet());
+
+app.post('/signin', login);
+app.post('/signup', createUser);
+
+app.use(auth);
 
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);

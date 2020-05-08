@@ -21,10 +21,13 @@ const getUser = (req, res) => {
 };
 
 
+// eslint-disable-next-line consistent-return
 const createUser = (req, res) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
+
+  if (password.length < 10) return res.status(400).send({ data: 'Длина пароля меньше 10 символов' });
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({

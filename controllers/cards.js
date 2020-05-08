@@ -22,12 +22,17 @@ const createCard = (req, res) => {
 
 const deleteCard = (req, res) => {
   const { cardId } = req.params;
-  Card.findByIdAndDelete(cardId)
+  Card.findById(cardId)
     .then((card) => {
       if (!card) {
         return res.status(404).send({ message: 'Карточки с таким id не существует' });
+      } if (card.owner.toString() !== req.user._id.toString()) {
+        return res.status(403).send({ message: 'Доступ запрещен' });
       }
-      return res.send(card);
+      return Card.findByIdAndRemove(cardId)
+        .then((cardForRemove) => {
+          res.send(cardForRemove);
+        });
     })
     .catch((err) => res.status(500).send({ message: err.message }));
 };

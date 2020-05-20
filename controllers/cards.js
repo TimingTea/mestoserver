@@ -1,4 +1,7 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/not-found');
+const ForbiddenError = require('../errors/forbidden');
+const BadReauestError = require('../errors/bad-request');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -13,7 +16,7 @@ const createCard = (req, res) => {
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        throw new BadReauestError('Неверный запрос');
       } else {
         res.status(500).send({ message: err.message });
       }
@@ -25,9 +28,9 @@ const deleteCard = (req, res) => {
   Card.findById(cardId)
     .then((card) => {
       if (!card) {
-        return res.status(404).send({ message: 'Карточки с таким id не существует' });
+        throw new NotFoundError('Карточки с таким id не существует');
       } if (card.owner.toString() !== req.user._id.toString()) {
-        return res.status(403).send({ message: 'Доступ запрещен' });
+        throw new ForbiddenError('Доступ запрещен');
       }
       return Card.findByIdAndRemove(cardId)
         .then((cardForRemove) => {

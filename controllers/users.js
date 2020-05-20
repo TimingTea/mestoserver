@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { secretkey } = require('../middlewares/auth');
+const NotFoundError = require('../errors/not-found');
+const UnauthorizedError = require('../errors/unauthorized');
 
 const getUsers = (req, res) => {
   User.find({})
@@ -13,7 +15,7 @@ const getUser = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Пользователя с таким id не существует' });
+        throw new NotFoundError('Пользователя с таким id не существует');
       }
       return res.send(user);
     })
@@ -27,7 +29,7 @@ const createUser = (req, res) => {
     name, about, avatar, email, password,
   } = req.body;
 
-  if (password.length < 10) return res.status(400).send({ data: 'Длина пароля меньше 10 символов' });
+  if (password.length < 10) throw new UnauthorizedError('Длина пароля меньше 10 символов');
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -36,7 +38,7 @@ const createUser = (req, res) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
+        throw new UnauthorizedError(err.message);
       } else {
         res.status(500).send({ message: err.message });
       }
@@ -62,7 +64,7 @@ const login = (req, res) => {
         .end();
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      throw new UnauthorizedError(err.message);
     });
 };
 

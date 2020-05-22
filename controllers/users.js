@@ -5,13 +5,14 @@ const { secretkey } = require('../middlewares/auth');
 const NotFoundError = require('../errors/not-found');
 const UnauthorizedError = require('../errors/unauthorized');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    // eslint-disable-next-line no-undef
+    .catch(next);
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
@@ -19,17 +20,17 @@ const getUser = (req, res) => {
       }
       return res.send(user);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    // eslint-disable-next-line no-undef
+    .catch(next);
 };
 
 
 // eslint-disable-next-line consistent-return
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
 
-  if (password.length < 10) throw new UnauthorizedError('Длина пароля меньше 10 символов');
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
@@ -40,12 +41,13 @@ const createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         throw new UnauthorizedError(err.message);
       } else {
-        res.status(500).send({ message: err.message });
+        // eslint-disable-next-line no-undef
+        next();
       }
     });
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -64,7 +66,7 @@ const login = (req, res) => {
         .end();
     })
     .catch((err) => {
-      throw new UnauthorizedError(err.message);
+      next(new UnauthorizedError(err.message));
     });
 };
 

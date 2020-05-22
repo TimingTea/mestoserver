@@ -35,7 +35,7 @@ const createUser = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.send(user))
+    .then((user) => res.status(201).send(user.omitPrivate()))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         throw new UnauthorizedError(err.message);

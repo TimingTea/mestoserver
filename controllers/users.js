@@ -8,7 +8,7 @@ const UnauthorizedError = require('../errors/unauthorized');
 const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    // eslint-disable-next-line no-undef
+
     .catch(next);
 };
 
@@ -20,7 +20,6 @@ const getUser = (req, res, next) => {
       }
       return res.send(user);
     })
-    // eslint-disable-next-line no-undef
     .catch(next);
 };
 
@@ -37,14 +36,7 @@ const createUser = (req, res, next) => {
       name, about, avatar, email, password: hash,
     }))
     .then((user) => res.status(201).send(user.omitPrivate()))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new UnauthorizedError(err.message);
-      } else {
-        // eslint-disable-next-line no-undef
-        next();
-      }
-    });
+    .catch(next);
 };
 
 const login = (req, res, next) => {

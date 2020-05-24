@@ -18,18 +18,14 @@ const createCard = (req, res, next) => {
 };
 
 const deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
-  Card.findById(cardId)
+  Card.findById(req.params.cardId)
+    .orFail(new NotFoundError(`Карточки с таким id  ${req.params.cardId} не существует`))
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError('Карточки с таким id не существует');
-      } if (card.owner.toString() !== req.user._id.toString()) {
-        throw new ForbiddenError('Доступ запрещен');
+      if (!card.owner.equals(req.user._id)) {
+        throw new ForbiddenError('Доступ запрещен, нельзя удалить карточку другого пользователя');
       }
-      return Card.findByIdAndRemove(cardId)
-        .then((cardForRemove) => {
-          res.send(cardForRemove);
-        });
+      return Card.deleteOne(card)
+        .then(() => res.send({ data: card }));
     })
     .catch(next);
 };

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const { celebrate, Joi, errors } = require('celebrate');
+const cookieParser = require('cookie-parser');
 
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
@@ -27,6 +28,7 @@ app.use(bodyParser.json());
 app.use(helmet());
 
 app.use(requestLogger);
+app.use(cookieParser());
 
 // удалить поздже
 app.get('/crash-test', () => {

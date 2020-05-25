@@ -7,13 +7,7 @@ const secretkey = NODE_ENV === 'production' ? JWT_SECRET : 'secret-key';
 
 
 const auth = (req, res, next) => {
-  const { cookie } = req.headers;
-
-  if (!cookie || !cookie.startsWith('jwt=')) {
-    throw new UnauthorizedError('Необходима авторизация');
-  }
-
-  const token = cookie.replace('jwt=', '');
+  const token = req.cookies.jwt;
   let payload;
 
   try {

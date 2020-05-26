@@ -80,3 +80,6 @@ app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Сервер запущен, приложение слушает порт: ${PORT}`);
 });
+
+// eslint-disable-next-line no-console
+console.log(process.env);

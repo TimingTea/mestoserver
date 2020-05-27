@@ -30,12 +30,6 @@ app.use(helmet());
 app.use(requestLogger);
 app.use(cookieParser());
 
-// удалить поздже
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -80,6 +74,3 @@ app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Сервер запущен, приложение слушает порт: ${PORT}`);
 });
-
-// eslint-disable-next-line no-console
-console.log(process.env);

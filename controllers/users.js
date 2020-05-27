@@ -2,48 +2,44 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { secretkey } = require('../middlewares/auth');
+const NotFoundError = require('../errors/not-found');
+const UnauthorizedError = require('../errors/unauthorized');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
-    .catch((err) => res.status(500).send({ message: err.message }));
+
+    .catch(next);
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Пользователя с таким id не существует' });
+        throw new NotFoundError('Пользователя с таким id не существует');
       }
       return res.send(user);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
 
 // eslint-disable-next-line consistent-return
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
 
-  if (password.length < 10) return res.status(400).send({ data: 'Длина пароля меньше 10 символов' });
 
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: err.message });
-      } else {
-        res.status(500).send({ message: err.message });
-      }
-    });
+    .then((user) => res.status(201).send(user.omitPrivate()))
+    .catch(next);
 };
 
-const login = (req, res) => {
+const login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -62,7 +58,7 @@ const login = (req, res) => {
         .end();
     })
     .catch((err) => {
-      res.status(401).send({ message: err.message });
+      next(new UnauthorizedError(err.message));
     });
 };
 
